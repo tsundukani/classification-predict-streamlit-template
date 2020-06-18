@@ -69,14 +69,15 @@ def main():
 		st.info("Prediction with ML Models")
 		# Creating a text box for user input
 		tweet_text = st.text_area("Enter Text","Type Here")
-
-	 	#uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
+		st.markdown("or alternatively")
+		uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
+		if uploaded_file is not None:
+    			data = pd.read_csv(uploaded_file)
      
 		if st.button("Classify"):
 			# Transforming user input with vectorizer
 			vect_text = tweet_cv.transform([tweet_text]).toarray()
 
-			#data = pd.read_csv(uploaded_file)
 			#vect_df = tweet_cv.transform(data['message']).toarray()
 			# Load your .pkl file with the model of your choice + make predictions
 			# Try loading in multiple models to give the user a choice
