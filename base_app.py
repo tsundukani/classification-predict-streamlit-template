@@ -59,19 +59,30 @@ def main():
 		if st.checkbox('Show raw data'): # data is hidden if box is unchecked
 			st.write(raw[['sentiment', 'message']]) # will write the df to the page
 
+		uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
+		if uploaded_file is not None:
+			data = pd.read_csv(uploaded_file)
+			st.write(data[['message']])
+
 	# Building out the predication page
 	if selection == "Prediction":
 		st.info("Prediction with ML Models")
 		# Creating a text box for user input
 		tweet_text = st.text_area("Enter Text","Type Here")
 
+	 	#uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
+     
 		if st.button("Classify"):
 			# Transforming user input with vectorizer
 			vect_text = tweet_cv.transform([tweet_text]).toarray()
+
+			#data = pd.read_csv(uploaded_file)
+			#vect_df = tweet_cv.transform(data['message']).toarray()
 			# Load your .pkl file with the model of your choice + make predictions
 			# Try loading in multiple models to give the user a choice
 			predictor = joblib.load(open(os.path.join("resources/linearSVC.pkl"),"rb"))
 			prediction = predictor.predict(vect_text)
+			#prediction = predictor.predict(vect_df)
 
 			# When model has successfully run, will print prediction
 			# You can use a dictionary or similar structure to make this output
