@@ -29,6 +29,7 @@ import joblib,os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from PIL import Image
 
 # Vectorizer
 news_vectorizer = open("resources/vectoriser.pkl","rb")
@@ -45,6 +46,12 @@ def main():
 	# these are static across all pages
 	st.title("Tweet Classifer")
 	st.subheader("Climate change tweet classification")
+
+
+	#Image that explains the classifications
+	image = Image.open(r'C:\Users\ADMIN\Documents\predicts\classification\classification-predict-streamlit-template-master\resources\imgs\classifications.png')
+	st.image(image, use_column_width=True)
+
 
 	# Creating sidebar with selection box -
 	# you can create multiple pages this way
@@ -87,6 +94,10 @@ def main():
 		uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
 		if uploaded_file is not None:
     			data = pd.read_csv(uploaded_file)
+
+		#Classifier selection
+		Classifier = st.selectbox("Choose Classifier",['Linear SVC','Logistic regression'])
+     
      
 		if st.button("Classify"):
 			# Transforming user input with vectorizer
@@ -94,12 +105,26 @@ def main():
 
 			# Load your .pkl file with the model of your choice + make predictions
 			# Try loading in multiple models to give the user a choice
-			predictor = joblib.load(open(os.path.join("resources/linearSVC.pkl"),"rb"))
+			if Classifier =='Linear SVC':
+					st.text("Using Linear SVC classifier ..")
+					predictor = joblib.load(open(os.path.join("resources/linearSVC.pkl"),"rb"))
+			elif Classifier == 'Logistic regression':
+					st.text("Using Logistic Regression Classifeir ..")
+					predictor = joblib.load(open(os.path.join("resources/Logistic_regression.pkl"),"rb"))
+			#predictor = joblib.load(open(os.path.join("resources/linearSVC.pkl"),"rb"))
 			prediction = predictor.predict(vect_text)
 
 			# When model has successfully run, will print prediction
 			# You can use a dictionary or similar structure to make this output
 			# more human interpretable.
+
+			#Table that tabulates the results
+
+			dataframe = pd.DataFrame()
+			dataframe['Text'] = tweet_text
+			dataframe['Sentiment'] = prediction
+			prediction = st.table(dataframe)
+
 			st.success("Text Categorized as: {}".format(prediction))
 
 # Required to let Streamlit instantiate our web app.  
