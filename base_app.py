@@ -27,6 +27,8 @@ import joblib,os
 
 # Data dependencies
 import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 
 # Vectorizer
 news_vectorizer = open("resources/vectoriser.pkl","rb")
@@ -63,6 +65,18 @@ def main():
 		if uploaded_file is not None:
 			data = pd.read_csv(uploaded_file)
 			st.write(data[['message']])
+		
+		if st.checkbox('Show EDA'):
+			st.subheader('Counts of tweets per class')
+			plt.bar([1,2,3,4], raw['sentiment'].value_counts(), color=['red', 'green', 'blue', 'orange'])
+			plt.xticks([1,2,3,4], ['pro', 'news', 'neutral', 'anti'])
+			plt.ylabel('Count')
+			plt.xlabel('Sentiment')
+
+			st.pyplot()
+
+			#hist_values = np.histogram(raw['sentiment'], bins=4)[0]
+			#st.bar_chart(hist_values)
 
 	# Building out the predication page
 	if selection == "Prediction":
@@ -78,12 +92,10 @@ def main():
 			# Transforming user input with vectorizer
 			vect_text = tweet_cv.transform([tweet_text]).toarray()
 
-			#vect_df = tweet_cv.transform(data['message']).toarray()
 			# Load your .pkl file with the model of your choice + make predictions
 			# Try loading in multiple models to give the user a choice
 			predictor = joblib.load(open(os.path.join("resources/linearSVC.pkl"),"rb"))
 			prediction = predictor.predict(vect_text)
-			#prediction = predictor.predict(vect_df)
 
 			# When model has successfully run, will print prediction
 			# You can use a dictionary or similar structure to make this output
