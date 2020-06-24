@@ -48,11 +48,6 @@ def main():
 	st.subheader("Climate change tweet classification")
 
 
-	#Image that explains the classifications
-	image = Image.open(r'resources\imgs\classifications.png')
-	st.image(image, use_column_width=True)
-
-
 	# Creating sidebar with selection box -
 	# you can create multiple pages this way
 	options = ["Prediction", "Information"]
@@ -68,12 +63,18 @@ def main():
 		your product or service on social media, and can help you detect angry customers or negative
 		mentions before they turn into a major crisis. At the same time, Twitter sentiment analysis can
 		provide interesting insights. What do customers love about your brand? What aspects get the most
-		negative mentions?''')
+		negative mentions? And so on.''')
+
 
 		st.subheader("Raw Twitter data and label")
+		st.markdown('''Let us take a look at the raw data that we are going to use to train whichever
+					model we choose to use to make the sentiment predictions.''')
 		if st.checkbox('Show raw data'): # data is hidden if box is unchecked
 			st.write(raw[['sentiment', 'message']]) # will write the df to the page
-
+			
+			image = Image.open(r'resources\imgs\classifications.png')
+			st.markdown('''The sentiments are defined as follows:''')
+			st.image(image, use_column_width=True)
 		uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
 		if uploaded_file is not None:
 			data = pd.read_csv(uploaded_file)
