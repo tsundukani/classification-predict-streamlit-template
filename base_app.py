@@ -49,7 +49,7 @@ def main():
 
 
 	#Image that explains the classifications
-	image = Image.open(r'C:\Users\ADMIN\Documents\predicts\classification\classification-predict-streamlit-template-master\resources\imgs\classifications.png')
+	image = Image.open(r'resources\imgs\classifications.png')
 	st.image(image, use_column_width=True)
 
 
@@ -62,7 +62,13 @@ def main():
 	if selection == "Information":
 		st.info("General Information")
 		# You can read a markdown file from supporting resources folder
-		st.markdown("Some information here")
+		st.markdown('''Online reputation is one of the most precious assets for brands. A bad
+		review on social media can be costly to a company if it's not handled effectively and swiftly.
+		Twitter sentiment analysis allows you to keep track of what's being said about
+		your product or service on social media, and can help you detect angry customers or negative
+		mentions before they turn into a major crisis. At the same time, Twitter sentiment analysis can
+		provide interesting insights. What do customers love about your brand? What aspects get the most
+		negative mentions?''')
 
 		st.subheader("Raw Twitter data and label")
 		if st.checkbox('Show raw data'): # data is hidden if box is unchecked
