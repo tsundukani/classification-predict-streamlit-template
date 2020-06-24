@@ -48,6 +48,11 @@ def main():
 	st.subheader("Climate change tweet classification")
 
 
+	#Image that explains the classifications
+	image = Image.open(r'C:\Users\ADMIN\Documents\predicts\classification\classification-predict-streamlit-template-master\resources\imgs\classifications.png')
+	st.image(image, use_column_width=True)
+
+
 	# Creating sidebar with selection box -
 	# you can create multiple pages this way
 	options = ["Prediction", "Information"]
@@ -57,24 +62,12 @@ def main():
 	if selection == "Information":
 		st.info("General Information")
 		# You can read a markdown file from supporting resources folder
-		st.markdown('''Online reputation is one of the most precious assets for brands. A bad
-		review on social media can be costly to a company if it's not handled effectively and swiftly.
-		Twitter sentiment analysis allows you to keep track of what's being said about
-		your product or service on social media, and can help you detect angry customers or negative
-		mentions before they turn into a major crisis. At the same time, Twitter sentiment analysis can
-		provide interesting insights. What do customers love about your brand? What aspects get the most
-		negative mentions? And so on.''')
-
+		st.markdown("Some information here")
 
 		st.subheader("Raw Twitter data and label")
-		st.markdown('''Let us take a look at the raw data that we are going to use to train whichever
-					model we choose to use to make the sentiment predictions.''')
 		if st.checkbox('Show raw data'): # data is hidden if box is unchecked
 			st.write(raw[['sentiment', 'message']]) # will write the df to the page
-			
-			image = Image.open(r'resources\imgs\classifications.png')
-			st.markdown('''The sentiments are defined as follows:''')
-			st.image(image, use_column_width=True)
+
 		uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
 		if uploaded_file is not None:
 			data = pd.read_csv(uploaded_file)
@@ -100,15 +93,17 @@ def main():
 		st.markdown("or alternatively")
 		uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
 		if uploaded_file is not None:
-    			data = pd.read_csv(uploaded_file)
+    			tweet_text = pd.read_csv(uploaded_file)['message']
+					
 
 		#Classifier selection
 		Classifier = st.selectbox("Choose Classifier",['Linear SVC','Logistic regression'])
+		size = st.selectbox("Choose Size of results table",[5,10,15,20,30,60])
      
      
 		if st.button("Classify"):
 			# Transforming user input with vectorizer
-			vect_text = tweet_cv.transform([tweet_text]).toarray()
+
 
 			# Load your .pkl file with the model of your choice + make predictions
 			# Try loading in multiple models to give the user a choice
@@ -119,7 +114,16 @@ def main():
 					st.text("Using Logistic Regression Classifeir ..")
 					predictor = joblib.load(open(os.path.join("resources/Logistic_regression.pkl"),"rb"))
 			#predictor = joblib.load(open(os.path.join("resources/linearSVC.pkl"),"rb"))
-			prediction = predictor.predict(vect_text)
+			results = []
+			n = 0
+			while n < len(tweet_text):	
+				vect_text = tweet_cv.transform([tweet_text[n]]).toarray()
+				prediction = predictor.predict(vect_text)
+				results.append((tweet_text[n],prediction))
+				n+=1
+
+
+			df = pd.DataFrame(results,columns=['Message','Sentiment'])
 
 			# When model has successfully run, will print prediction
 			# You can use a dictionary or similar structure to make this output
@@ -127,12 +131,20 @@ def main():
 
 			#Table that tabulates the results
 
-			dataframe = pd.DataFrame()
-			dataframe['Text'] = tweet_text
-			dataframe['Sentiment'] = prediction
-			prediction = st.table(dataframe)
+			#dataframe = pd.DataFrame()
+			#dataframe['Text'] = tweet_text
+			#dataframe['Sentiment'] = prediction
+			predictions = st.table(df.head(size))
 
-			st.success("Text Categorized as: {}".format(prediction))
+			st.success("Text Categorized as: {}".format(predictions))
+
+
+			st.subheader('Counts of tweets per class')
+			plt.bar([1,2,3,4], df['Sentiment'].value_counts(), color=['red', 'green', 'blue', 'orange'])
+			plt.xticks([1,2,3,4], ['pro', 'news', 'neutral', 'anti'])
+			plt.ylabel('Count')
+			plt.xlabel('Sentiment')
+			st.pyplot()
 
 # Required to let Streamlit instantiate our web app.  
 if __name__ == '__main__':
