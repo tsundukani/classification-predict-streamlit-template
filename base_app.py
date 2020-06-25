@@ -29,11 +29,12 @@ import joblib,os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib
+from sklearn.metrics import accuracy_score
+#import nltk
 from PIL import Image
 
-# Vectorizer
-news_vectorizer = open("resources/vectoriser.pkl","rb")
-tweet_cv = joblib.load(news_vectorizer) # loading your vectorizer from the pkl file
+ # loading your vectorizer from the pkl file
 
 # Load your raw data
 raw = pd.read_csv("resources/train.csv")
@@ -91,12 +92,16 @@ def main():
 	# Building out the predication page
 	if selection == "Prediction":
 		st.info("Prediction with ML Models")
+
+		#A table that explains the sentiment predictions
+		image = Image.open(r'resources\imgs\classifications.png')
+		st.image(image, use_column_width=True)
 		# Creating a text box for user input
 		tweet_text = st.text_area("Enter Text","Type Here")
 		st.markdown("or alternatively")
 		uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
 		if uploaded_file is not None:
-    			tweet_text = pd.read_csv(uploaded_file)['message']
+    			tweet_text = pd.read_csv(uploaded_file)
 					
 
 		#Classifier selection
@@ -112,21 +117,31 @@ def main():
 			# Try loading in multiple models to give the user a choice
 			if Classifier =='Linear SVC':
 					st.text("Using Linear SVC classifier ..")
+					# Vectorizer
+					news_vectorizer = open("resources/vectoriser.pkl","rb")
+					tweet_cv = joblib.load(news_vectorizer)
 					predictor = joblib.load(open(os.path.join("resources/linearSVC.pkl"),"rb"))
 			elif Classifier == 'Logistic regression':
 					st.text("Using Logistic Regression Classifeir ..")
+					# Vectorizer
+					news_vectorizer = open("resources/tfidfvect.pkl","rb")
+					tweet_cv = joblib.load(news_vectorizer)
 					predictor = joblib.load(open(os.path.join("resources/Logistic_regression.pkl"),"rb"))
+
 			#predictor = joblib.load(open(os.path.join("resources/linearSVC.pkl"),"rb"))
 			results = []
 			n = 0
 			while n < len(tweet_text):	
-				vect_text = tweet_cv.transform([tweet_text[n]]).toarray()
+				vect_text = tweet_cv.transform([tweet_text['message'][n]]).toarray()
 				prediction = predictor.predict(vect_text)
-				results.append((tweet_text[n],prediction))
+				results.append((tweet_text['message'][n],prediction))
 				n+=1
 
 
 			df = pd.DataFrame(results,columns=['Message','Sentiment'])
+
+			#Model accuracy
+			#st.write("Model Accuracy on Raw/Training data is :",accuracy_score(tweet_text['sentiment'].values, df['Sentiment'].values))
 
 			# When model has successfully run, will print prediction
 			# You can use a dictionary or similar structure to make this output
@@ -141,13 +156,18 @@ def main():
 
 			st.success("Text Categorized as: {}".format(predictions))
 
-
+			#Graph showing the spread of sentiments in the results table
 			st.subheader('Counts of tweets per class')
 			plt.bar([1,2,3,4], df['Sentiment'].value_counts(), color=['red', 'green', 'blue', 'orange'])
 			plt.xticks([1,2,3,4], ['pro', 'news', 'neutral', 'anti'])
 			plt.ylabel('Count')
 			plt.xlabel('Sentiment')
 			st.pyplot()
+			st.markdown('''Count number of most occuring words Table''')
+			from collections import Counter
+			count = Counter(" ".join(df["Message"]).split()).most_common(100)
+			st.table(pd.DataFrame(count,columns=['Word','Number of Occurances']).head(size))
+
 
 # Required to let Streamlit instantiate our web app.  
 if __name__ == '__main__':
