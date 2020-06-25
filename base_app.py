@@ -93,7 +93,21 @@ def main():
 	if selection == "Machine Learning Overview":
 		st.info("What is Machine Learning?")
 		st.markdown('''How does this all work? How are able to classify how a person feels from
-					just a simple tweet?''')
+					just a simple tweet? to answer this question we first have to understand what 
+					Machine Learning is. By definition, Machine learning provides computers with
+					the ability to learn without being explicitly programmed.
+					Let’s try to understand Machine Learning in layman terms. \nConsider you are 
+					trying to toss a paper to a dustbin.''')
+		image = Image.open(r'resources\imgs\dustbin.jpeg')
+		st.image(image, use_column_width=True)
+
+		st.markdown('''After first attempt you realise that you have put too much force in it.
+		After second attempt you realise you are closer to target but you need to increase your
+		 throw angle. What is happening here is basically after every throw we are learning something
+		  and improving the end result. We are programmed to learn from our experience.
+		We can do something similar with machines too. We can program a machine to learn from every
+ 		attempts/experiences/data-points and then improve the outcome. Let’s see paper toss example in Machine
+  		and Non-Machine approach.''')
     		
 
 	# Building out the predication page
