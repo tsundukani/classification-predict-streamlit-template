@@ -50,7 +50,7 @@ def main():
 
 	# Creating sidebar with selection box -
 	# you can create multiple pages this way
-	options = ["Prediction", "Information"]
+	options = ["Information", "Machine Learning Overview", "Prediction"]
 	selection = st.sidebar.selectbox("Choose Option", options)
 
 	# Building out the "Information" page
@@ -88,6 +88,13 @@ def main():
 			plt.xlabel('Sentiment')
 
 			st.pyplot()
+
+	# Building out the Overiew Page
+	if selection == "Machine Learning Overview":
+		st.info("What is Machine Learning?")
+		st.markdown('''How does this all work? How are able to classify how a person feels from
+					just a simple tweet?''')
+    		
 
 	# Building out the predication page
 	if selection == "Prediction":
