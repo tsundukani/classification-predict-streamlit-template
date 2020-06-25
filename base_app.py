@@ -124,6 +124,33 @@ def main():
 		if uploaded_file is not None:
     			tweet_text = pd.read_csv(uploaded_file)
 					
+		if st.checkbox('Show Model Acuracy on Training data'): # Model acuracy  is hidden if box is unchecked
+			#calculation and prediction of Linear SVC Model using raw data
+			news_vectorizer1 = open("resources/vectoriser.pkl","rb")
+			tweet_cv1 = joblib.load(news_vectorizer1)
+			predictor1 = joblib.load(open(os.path.join("resources/linearSVC.pkl"),"rb"))
+			results_linear = []
+			n = 0
+			while n < len(raw['message']):	
+				vect_text1 = tweet_cv1.transform([raw['message'][n]]).toarray()
+				prediction = predictor1.predict(vect_text1)
+				results_linear.append(prediction)
+				n+=1
+			st.write("Linear SVC Model Accuracy on Raw/Training data is :",accuracy_score(raw['sentiment'].values, results_linear))
+
+			#Calculation and prediction for Logistic regresssion model using raw data
+
+			news_vectorizer2 = open("resources/tfidfvect.pkl","rb")
+			tweet_cv2 = joblib.load(news_vectorizer2)
+			predictor2 = joblib.load(open(os.path.join("resources/Logistic_regression.pkl"),"rb"))
+			results_logistic = []
+			n = 0
+			while n < len(raw['message']):	
+				vect_text1 = tweet_cv2.transform([raw['message'][n]]).toarray()
+				prediction = predictor2.predict(vect_text1)
+				results_logistic.append(prediction)
+				n+=1
+			st.write("Logistic Regression  Model Accuracy on Raw/Training data is :",accuracy_score(raw['sentiment'].values, results_logistic))
 
 		#Classifier selection
 		Classifier = st.selectbox("Choose Classifier",['Linear SVC','Logistic regression'])
@@ -161,18 +188,8 @@ def main():
 
 			df = pd.DataFrame(results,columns=['Message','Sentiment'])
 
-			#Model accuracy
-			#st.write("Model Accuracy on Raw/Training data is :",accuracy_score(tweet_text['sentiment'].values, df['Sentiment'].values))
-
-			# When model has successfully run, will print prediction
-			# You can use a dictionary or similar structure to make this output
-			# more human interpretable.
 
 			#Table that tabulates the results
-
-			#dataframe = pd.DataFrame()
-			#dataframe['Text'] = tweet_text
-			#dataframe['Sentiment'] = prediction
 			predictions = st.table(df.head(size))
 
 			st.success("Text Categorized as: {}".format(predictions))
