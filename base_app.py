@@ -47,12 +47,6 @@ def main():
 	st.title("Tweet Classifer")
 	st.subheader("Climate change tweet classification")
 
-
-	#Image that explains the classifications
-	image = Image.open(r'C:\Users\ADMIN\Documents\predicts\classification\classification-predict-streamlit-template-master\resources\imgs\classifications.png')
-	st.image(image, use_column_width=True)
-
-
 	# Creating sidebar with selection box -
 	# you can create multiple pages this way
 	options = ["Prediction", "Information"]
@@ -62,11 +56,23 @@ def main():
 	if selection == "Information":
 		st.info("General Information")
 		# You can read a markdown file from supporting resources folder
-		st.markdown("Some information here")
+		st.markdown('''Online reputation is one of the most precious assets for brands.
+		A bad review on social media can be costly to a company if it’s not handled 
+		effectively and swiftly. Twitter sentiment analysis allows you to keep track of
+		 what’s being said about your product or service on social media, and can help you
+		  detect angry customers or negative mentions before they turn into a major crisis. 
+		At the same time, Twitter sentiment analysis can provide interesting insights. What
+		 do customers love about your brand?  What aspects get the most negative mentions?''')
 
 		st.subheader("Raw Twitter data and label")
+		st.markdown('''Let's take a look at the the raw data that is used to train whichever
+					model you choose to use to predict the sentiment''')
 		if st.checkbox('Show raw data'): # data is hidden if box is unchecked
 			st.write(raw[['sentiment', 'message']]) # will write the df to the page
+			st.markdown('''The sentiment classification is defined as as follows''')
+			#Image that explains the classifications
+			image = Image.open(r'resources\imgs\classifications.png')
+			st.image(image, use_column_width=True)
 
 		uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
 		if uploaded_file is not None:
@@ -81,9 +87,6 @@ def main():
 			plt.xlabel('Sentiment')
 
 			st.pyplot()
-
-			#hist_values = np.histogram(raw['sentiment'], bins=4)[0]
-			#st.bar_chart(hist_values)
 
 	# Building out the predication page
 	if selection == "Prediction":
