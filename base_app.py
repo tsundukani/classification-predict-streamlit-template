@@ -30,6 +30,9 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
+import seaborn as sns
+from wordcloud import WordCloud
+from nltk.tokenize import sent_tokenize, word_tokenize
 from sklearn.metrics import accuracy_score
 #import nltk
 from PIL import Image
@@ -38,6 +41,7 @@ from PIL import Image
 
 # Load your raw data
 raw = pd.read_csv("resources/train.csv")
+cleaned = pd.read_csv("resources/cleaned.csv")
 
 # The main function where we will build the actual app
 def main():
@@ -45,6 +49,8 @@ def main():
 
 	# Creates a main title and subheader on your page -
 	# these are static across all pages
+	header_image = Image.open(r'resources\imgs\header_image.jpeg')
+	st.image(header_image, use_column_width=True)
 	st.title("Tweet Classifer")
 	st.subheader("Climate change tweet classification")
 
@@ -68,18 +74,21 @@ def main():
 		st.subheader("Raw Twitter data and label")
 		st.markdown('''Let's take a look at the the raw data that is used to train whichever
 					model you choose to use to predict the sentiment''')
-		if st.checkbox('Show raw data'): # data is hidden if box is unchecked
-			st.write(raw[['sentiment', 'message']]) # will write the df to the page
-			st.markdown('''The sentiment classification is defined as as follows''')
-			#Image that explains the classifications
-			image = Image.open(r'resources\imgs\classifications.png')
-			st.image(image, use_column_width=True)
+		#if st.checkbox('Show raw data'): # data is hidden if box is unchecked
+		if st.checkbox("Preview Raw Data"):
+				data_dim = st.radio("What Section of Data Do You Want to Show?", ("Head", "Tail"))
+				if data_dim =="Head":
+						st.text("Showing Head of Data")
+						st.write(raw[['sentiment', 'message']].head())
+				if data_dim =="Tail":
+						st.text("Showing Tail of Data")
+						st.write(raw[['sentiment', 'message']].tail())
 
-		uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
-		if uploaded_file is not None:
-			data = pd.read_csv(uploaded_file)
-			st.write(data[['message']])
-		
+			#st.write(raw[['sentiment', 'message']]) # will write the df to the page
+				st.markdown('''The sentiment classification is defined as as follows''')
+			#Image that explains the classifications
+				image = Image.open(r'resources\imgs\classifications.png')
+				st.image(image, use_column_width=True)
 		if st.checkbox('Show EDA'):
 			st.subheader('Counts of tweets per class')
 			plt.bar([1,2,3,4], raw['sentiment'].value_counts(), color=['red', 'green', 'blue', 'orange'])
@@ -88,6 +97,21 @@ def main():
 			plt.xlabel('Sentiment')
 
 			st.pyplot()
+			c = []
+			for i in range(len(cleaned['message'])):
+				c.append(cleaned['message'][i])
+
+			st.markdown('''Let us use a wordcloud to take a look at which tags/words are most common in our raw data''')
+
+
+			# joining and making a complete list
+			wordcloud = WordCloud(width=2000, height=1000).generate(' '.join(c))  # word cloud
+			plt.figure(figsize=(30, 10))
+			plt.imshow(wordcloud)
+			plt.axis('off')
+			st.pyplot()
+
+			
 
 	# Building out the Overiew Page
 	if selection == "Machine Learning Overview":
@@ -108,6 +132,29 @@ def main():
 		We can do something similar with machines too. We can program a machine to learn from every
  		attempts/experiences/data-points and then improve the outcome. Let’s see paper toss example in Machine
   		and Non-Machine approach.''')
+
+		st.subheader('''A Generic Program (Non Machine Learning)''')
+
+		st.markdown('''In our above example, a generic program would tell computer to measure the distance and
+		 angle and apply some pre-defined formula to calculate the force required. Now if you add a fan (wind force)
+		  to your setup, this program will continuously miss target and won’t learn anything from it’s failed attempt.
+		   To get the outcome right, you need to reprogram taking wind factor into your formula.''')
+
+		st.subheader('''A Machine Learning Program''')
+
+		st.markdown('''Now, for the same example a Machine Learning program would begin with a generic formula but after
+		 every attempt/experience refactor it’s formula. As the formula is continuously improved using more experiences
+		  (data points) the outcome too improved. You see these things into action around you in YouTube’s Video 
+		   and Facebook’s News Feed Content etc''')
+		st.markdown('''Another more technical definition of Machine Learning is — A computer program is said to learn from
+		 experience E with respect to some class of tasks T and performance measure P if its performance at tasks in T, as
+		  measured by P, improves with experience E. This basically means in machine learning for any task a machine improves
+		   it’s performance with its experience. This is exactly what we observed in our paper toss example.''')
+		st.markdown('''You don’t need a Machine Learning algorithm to calculate a person’s age from his date of birth. But you would use a Machine 
+		Learning algorithm to guess a person's age using his Music likes. For example your data would point that Led Zeppelin
+		and The Doors fans are mostly 40+ and Selena Gomez fans are generally younger than 25. Machine Learning can be used in
+		 literally everything around you. But it’s important to understand that does the problem really needs to be solved through
+		  Machine Learning or not.''')
     		
 
 	# Building out the predication page
