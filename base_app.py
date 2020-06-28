@@ -49,7 +49,7 @@ def main():
 
 	# Creates a main title and subheader on your page -
 	# these are static across all pages
-	header_image = Image.open(r'resources\imgs\header_image.png')
+	header_image = Image.open(r'resources/imgs/header_image.png')
 	st.image(header_image, use_column_width=True)
 	st.title("Tweet Classifer")
 	st.subheader("Climate change tweet classification")
