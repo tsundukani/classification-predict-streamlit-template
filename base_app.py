@@ -49,7 +49,7 @@ def main():
 
 	# Creates a main title and subheader on your page -
 	# these are static across all pages
-	header_image = Image.open(r'resources\imgs\header_image.jpeg')
+	header_image = Image.open(r'resources/imgs/header_image.png')
 	st.image(header_image, use_column_width=True)
 	st.title("Tweet Classifer")
 	st.subheader("Climate change tweet classification")
@@ -87,7 +87,7 @@ def main():
 			#st.write(raw[['sentiment', 'message']]) # will write the df to the page
 				st.markdown('''The sentiment classification is defined as as follows''')
 			#Image that explains the classifications
-				image = Image.open(r'resources\imgs\classifications.png')
+				image = Image.open(r'resources/imgs/classifications.png')
 				st.image(image, use_column_width=True)
 		if st.checkbox('Show EDA'):
 			st.subheader('Counts of tweets per class')
@@ -122,7 +122,7 @@ def main():
 					the ability to learn without being explicitly programmed.
 					Let’s try to understand Machine Learning in layman terms. \nConsider you are 
 					trying to toss a paper to a dustbin.''')
-		image = Image.open(r'resources\imgs\dustbin.jpeg')
+		image = Image.open(r'resources/imgs/dustbin.jpeg')
 		st.image(image, use_column_width=True)
 
 		st.markdown('''After first attempt you realise that you have put too much force in it.
@@ -162,7 +162,7 @@ def main():
 		st.info("Prediction with ML Models")
 
 		#A table that explains the sentiment predictions
-		image = Image.open(r'resources\imgs\classifications.png')
+		image = Image.open(r'resources/imgs/classifications.png')
 		st.image(image, use_column_width=True)
 		# Creating a text box for user input
 		tweet_text = st.text_area("Enter Text","Type Here")
