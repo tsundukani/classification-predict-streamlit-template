@@ -34,6 +34,9 @@ import seaborn as sns
 from wordcloud import WordCloud
 from nltk.tokenize import sent_tokenize, word_tokenize
 from sklearn.metrics import accuracy_score
+
+#plots
+from plotly import graph_objs as go 
 #import nltk
 from PIL import Image
 
@@ -241,7 +244,7 @@ def main():
 
 			st.success("Text Categorized as: {}".format(predictions))
 
-			#Graph showing the spread of sentiments in the results table
+			#Bar Graph showing the spread of sentiments in the results table
 			st.subheader('Counts of tweets per class')
 			plt.bar([1,2,3,4], df['Sentiment'].value_counts(), color=['red', 'green', 'blue', 'orange'])
 			plt.xticks([1,2,3,4], ['pro', 'news', 'neutral', 'anti'])
@@ -249,9 +252,42 @@ def main():
 			plt.xlabel('Sentiment')
 			st.pyplot()
 			st.markdown('''Count number of most occuring words Table''')
+
 			from collections import Counter
 			count = Counter(" ".join(df["Message"]).split()).most_common(100)
 			st.table(pd.DataFrame(count,columns=['Word','Number of Occurances']).head(size))
+			#Funnel graph showing the spread of sentiments in the results table
+			clean_train_df = tweet_text
+			i = 0
+			news = []
+			pro = []
+			neutral = []
+			anti = []
+			while i < len(clean_train_df):
+				if clean_train_df['sentiment'].iloc[i] == 2:
+					news.append(clean_train_df['message'].iloc[i])
+				elif clean_train_df['sentiment'].iloc[i] == 1:
+					pro.append(clean_train_df['message'].iloc[i])
+				elif clean_train_df['sentiment'].iloc[i] == 0:
+					neutral.append(clean_train_df['message'].iloc[i])
+				else:
+					anti.append(clean_train_df['message'].iloc[i])
+				i += 1
+
+			st.markdown('''Count number of Sentiments (ordered by message)''')
+			temp = clean_train_df.groupby('sentiment').count()['message'].reset_index().sort_values(by='message',ascending=False)
+			temp.style.background_gradient(cmap='Purples')
+			st.table(temp.head())
+
+			fig = go.Figure(go.Funnelarea(
+				text = ["Pro","News", "Neutral", "Anti"],
+				values = temp['message'].values,
+				title = {"position": "top center", "text": "Sentiment Distribution"}
+				))
+			st.plotly_chart(fig)
+
+
+
 
 
 # Required to let Streamlit instantiate our web app.  
