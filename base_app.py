@@ -212,14 +212,13 @@ def main():
     			tweet_text = pd.read_csv(uploaded_file)
 					
 		if st.checkbox('Show Model Acuracy on Training data'): # Model acuracy  is hidden if box is unchecked
-			
+			st.markdown("NB:  Untick before classifying")
 			#calculation and prediction of Linear SVC Model using raw data
 			news_vectorizer1 = open("resources/vectoriser.pkl","rb")
 			tweet_cv1 = joblib.load(news_vectorizer1)
 			predictor1 = joblib.load(open(os.path.join("resources/linearSVC.pkl"),"rb"))
 			results_linear = []
 			n = 0
-			
 			while n < len(raw['message']):	
 				vect_text1 = tweet_cv1.transform([raw['message'][n]]).toarray()
 				prediction = predictor1.predict(vect_text1)
@@ -240,6 +239,9 @@ def main():
 				results_logistic.append(prediction)
 				n+=1
 			st.write("Logistic Regression  Model Accuracy on Raw/Training data is :",accuracy_score(raw['sentiment'].values, results_logistic))
+
+
+
 			
 
 
@@ -261,11 +263,23 @@ def main():
 					tweet_cv = joblib.load(news_vectorizer)
 					predictor = joblib.load(open(os.path.join("resources/linearSVC.pkl"),"rb"))
 			elif Classifier == 'Logistic regression':
-					st.text("Using Logistic Regression Classifeir ..")
+					st.text("Using Linear Regression Classifeir ..")
 					# Vectorizer
 					news_vectorizer = open("resources/tfidfvect.pkl","rb")
 					tweet_cv = joblib.load(news_vectorizer)
 					predictor = joblib.load(open(os.path.join("resources/Logistic_regression.pkl"),"rb"))
+			elif Classifier == 'Linear Regression':
+				st.text("Using Logistic Regression Classifeir ..")
+				# Vectorizer
+				news_vectorizer = open("resources/tfidfvect.pkl","rb")
+				tweet_cv = joblib.load(news_vectorizer)
+				predictor = joblib.load(open(os.path.join("resources/LinearRegression.pkl"),"rb"))
+			elif Classifier == 'RFC':
+				st.text("Using RFC Classifeir ..")
+				# Vectorizer
+				news_vectorizer = open("resources/vectoriser.pkl","rb")
+				tweet_cv = joblib.load(news_vectorizer)
+				predictor = joblib.load(open(os.path.join("resources/RFC.pkl"),"rb"))
 
 			#predictor = joblib.load(open(os.path.join("resources/linearSVC.pkl"),"rb"))
 			results = []
@@ -298,7 +312,6 @@ def main():
 			count = Counter(" ".join(df["Message"]).split()).most_common(20)
 			st.table(pd.DataFrame(count,columns=['Word','Number of Occurances']).head(size))
 
-			st.markdown('''Count number of most occuring words Graph''')
 
 			#words frequency in the results dataframe
 			sns.set(style="white")
@@ -306,46 +319,41 @@ def main():
 			# Visualising on a barplot.
 
 			fig, ax = plt.subplots(figsize = (9, 9))
-			sns.barplot(y="word", x='Number of Occurances', ax = ax, data=count_df, palette="Paired")
+			sns.barplot(y="word", x='Number of Occurances', ax = ax, data=count_df, palette="Paired").set_title('Count number of most occuring words Graph')
 			st.pyplot()
 			plt.savefig(r'resources/wordcount_graph.png')
 
 
 			#Funnel graph showing the spread of sentiments in the results table
 			clean_train_df = tweet_text
+			clean_train_df['sentiment'] = df['Sentiment']
 			i = 0
 			news = []
 			pro = []
 			neutral = []
 			anti = []
-			while i < len(df):
-				if df['Sentiment'].iloc[i] == 2:
-					news.append(df['Message'].iloc[i])
-				elif df['Sentiment'].iloc[i] == 1:
-					pro.append(df['Message'].iloc[i])
-				elif df['Sentiment'].iloc[i] == 0:
-					neutral.append(df['Message'].iloc[i])
+			while i < len(clean_train_df):
+				if clean_train_df['sentiment'].iloc[i] == 2:
+					news.append(clean_train_df['message'].iloc[i])
+				elif clean_train_df['sentiment'].iloc[i] == 1:
+					pro.append(clean_train_df['message'].iloc[i])
+				elif clean_train_df['sentiment'].iloc[i] == 0:
+					neutral.append(clean_train_df['message'].iloc[i])
 				else:
-					anti.append(df['Message'].iloc[i])
+					anti.append(clean_train_df['message'].iloc[i])
 				i += 1
 
 			st.markdown('''Count number of Sentiments (ordered by message)''')
-			temp = df.groupby('Sentiment').count(
-			)['Message'].reset_index().sort_values(by='Message', ascending=False)
+			temp = clean_train_df.groupby('sentiment').count()['message'].reset_index().sort_values(by='message',ascending=False)
 			temp.style.background_gradient(cmap='Purples')
 			st.table(temp.head())
 
 			fig = go.Figure(go.Funnelarea(
 				text = ["Pro","News", "Neutral", "Anti"],
-				values = temp['Message'].values,
+				values = temp['message'].values,
 				title = {"position": "top center", "text": "Sentiment Distribution"}
 				))
 			st.plotly_chart(fig)
-
-
-
-
-
 # Required to let Streamlit instantiate our web app.  
 if __name__ == '__main__':
 	main()
