@@ -318,25 +318,25 @@ def main():
 			pro = []
 			neutral = []
 			anti = []
-			while i < len(clean_train_df):
+			while i < len(df):
 				if df['Sentiment'].iloc[i] == 2:
-					news.append(clean_train_df['message'].iloc[i])
+					news.append(df['Message'].iloc[i])
 				elif df['Sentiment'].iloc[i] == 1:
-					pro.append(df['message'].iloc[i])
+					pro.append(df['Message'].iloc[i])
 				elif df['Sentiment'].iloc[i] == 0:
-					neutral.append(df['message'].iloc[i])
+					neutral.append(df['Message'].iloc[i])
 				else:
-					anti.append(df['message'].iloc[i])
+					anti.append(df['Message'].iloc[i])
 				i += 1
 
 			st.markdown('''Count number of Sentiments (ordered by message)''')
-			temp = df.groupby('Sentiment').count()['message'].reset_index().sort_values(by='message',ascending=False)
+			temp = df.groupby('Sentiment').count()['Message'].reset_index().sort_values(by='Message',ascending=False)
 			temp.style.background_gradient(cmap='Purples')
 			st.table(temp.head())
 
 			fig = go.Figure(go.Funnelarea(
 				text = ["Pro","News", "Neutral", "Anti"],
-				values = temp['message'].values,
+				values = temp['Message'].values,
 				title = {"position": "top center", "text": "Sentiment Distribution"}
 				))
 			st.plotly_chart(fig)
