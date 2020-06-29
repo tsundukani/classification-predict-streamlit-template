@@ -37,6 +37,8 @@ from sklearn.metrics import accuracy_score
 
 #plots
 from plotly import graph_objs as go 
+import seaborn as sns
+sns.set()
 #import nltk
 from PIL import Image
 
@@ -47,6 +49,7 @@ raw = pd.read_csv("resources/train.csv")
 cleaned = pd.read_csv("resources/cleaned.csv")
 
 # The main function where we will build the actual app
+#@st.cache()
 def main():
 	"""Tweet Classifier App with Streamlit """
 
@@ -200,18 +203,7 @@ def main():
 		st.image(image, use_column_width=True)
 
 
-		#prediction function 
-
-		def predictor_f(model,vectorizer,df):
-				results_ = []
-				n = 0
-				cv_text = joblib.load(vectorizer)
-				while n < len(df['message']):	
-					vect_text1 = cv_text.transform([df['message'][n]]).toarray()
-					prediction = model.predict(vect_text1)
-					results_.append(prediction)
-					n+=1
-				return results_
+		
 		# Creating a text box for user input
 		tweet_text = st.text_area("Enter Text","Type Here")
 		st.markdown("or alternatively")
@@ -220,19 +212,37 @@ def main():
     			tweet_text = pd.read_csv(uploaded_file)
 					
 		if st.checkbox('Show Model Acuracy on Training data'): # Model acuracy  is hidden if box is unchecked
+			
 			#calculation and prediction of Linear SVC Model using raw data
 			news_vectorizer1 = open("resources/vectoriser.pkl","rb")
+			tweet_cv1 = joblib.load(news_vectorizer1)
 			predictor1 = joblib.load(open(os.path.join("resources/linearSVC.pkl"),"rb"))
-			results_linear = predictor_f(predictor1,news_vectorizer1,raw)
+			results_linear = []
+			n = 0
+			
+			while n < len(raw['message']):	
+				vect_text1 = tweet_cv1.transform([raw['message'][n]]).toarray()
+				prediction = predictor1.predict(vect_text1)
+				results_linear.append(prediction)
+				n+=1
 			st.write("Linear SVC Model Accuracy on Raw/Training data is :",accuracy_score(raw['sentiment'].values, results_linear))
 
 			#Calculation and prediction for Logistic regresssion model using raw data
 
 			news_vectorizer2 = open("resources/tfidfvect.pkl","rb")
-
+			tweet_cv2 = joblib.load(news_vectorizer2)
 			predictor2 = joblib.load(open(os.path.join("resources/Logistic_regression.pkl"),"rb"))
-			results_logistic = predictor_f(predictor2,news_vectorizer2,raw)
+			results_logistic = []
+			n = 0
+			while n < len(raw['message']):	
+				vect_text1 = tweet_cv2.transform([raw['message'][n]]).toarray()
+				prediction = predictor2.predict(vect_text1)
+				results_logistic.append(prediction)
+				n+=1
 			st.write("Logistic Regression  Model Accuracy on Raw/Training data is :",accuracy_score(raw['sentiment'].values, results_logistic))
+			
+
+
 
 		#Classifier selection
 		Classifier = st.selectbox("Choose Classifier",['Linear SVC','Logistic regression'])
@@ -240,8 +250,7 @@ def main():
      
      
 		if st.button("Classify"):
-			# Transforming user input with vectorizer
-
+			
 
 			# Load your .pkl file with the model of your choice + make predictions
 			# Try loading in multiple models to give the user a choice
@@ -286,8 +295,22 @@ def main():
 			st.markdown('''Count number of most occuring words Table''')
 
 			from collections import Counter
-			count = Counter(" ".join(df["Message"]).split()).most_common(100)
+			count = Counter(" ".join(df["Message"]).split()).most_common(20)
 			st.table(pd.DataFrame(count,columns=['Word','Number of Occurances']).head(size))
+
+			st.markdown('''Count number of most occuring words Graph''')
+
+			#words frequency in the results dataframe
+			sns.set(style="white")
+			count_df = pd.DataFrame(count,columns = ['word', 'Number of Occurances'])
+			# Visualising on a barplot.
+
+			fig, ax = plt.subplots(figsize = (9, 9))
+			sns.barplot(y="word", x='Number of Occurances', ax = ax, data=count_df, palette="Paired")
+			st.pyplot()
+			plt.savefig(r'resources/wordcount_graph.png')
+
+
 			#Funnel graph showing the spread of sentiments in the results table
 			clean_train_df = tweet_text
 			i = 0
