@@ -206,6 +206,7 @@ def main():
 		
 		# Creating a text box for user input
 		tweet_text = st.text_area("Enter Text","Type Here")
+		tweet_text = pd.DataFrame(list([tweet_text]),columns=['message'])
 		st.markdown("or alternatively")
 		uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
 		if uploaded_file is not None:
