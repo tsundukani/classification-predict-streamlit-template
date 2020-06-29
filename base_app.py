@@ -273,7 +273,7 @@ def main():
 			while n < len(tweet_text):	
 				vect_text = tweet_cv.transform([tweet_text['message'][n]]).toarray()
 				prediction = predictor.predict(vect_text)
-				results.append((tweet_text['message'][n],prediction))
+				results.append((tweet_text['message'][n],prediction[0]))
 				n+=1
 
 
