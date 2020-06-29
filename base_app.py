@@ -198,6 +198,20 @@ def main():
 		#A table that explains the sentiment predictions
 		image = Image.open(r'resources/imgs/classifications.png')
 		st.image(image, use_column_width=True)
+
+
+		#prediction function 
+
+		def predictor_f(model,vectorizer,df):
+				results_ = []
+				n = 0
+				cv_text = joblib.load(vectorizer)
+				while n < len(df['message']):	
+					vect_text1 = cv_text.transform([df['message'][n]]).toarray()
+					prediction = model.predict(vect_text1)
+					results_.append(prediction)
+					n+=1
+				return results_
 		# Creating a text box for user input
 		tweet_text = st.text_area("Enter Text","Type Here")
 		st.markdown("or alternatively")
@@ -208,29 +222,16 @@ def main():
 		if st.checkbox('Show Model Acuracy on Training data'): # Model acuracy  is hidden if box is unchecked
 			#calculation and prediction of Linear SVC Model using raw data
 			news_vectorizer1 = open("resources/vectoriser.pkl","rb")
-			tweet_cv1 = joblib.load(news_vectorizer1)
 			predictor1 = joblib.load(open(os.path.join("resources/linearSVC.pkl"),"rb"))
-			results_linear = []
-			n = 0
-			while n < len(raw['message']):	
-				vect_text1 = tweet_cv1.transform([raw['message'][n]]).toarray()
-				prediction = predictor1.predict(vect_text1)
-				results_linear.append(prediction)
-				n+=1
+			results_linear = predictor_f(predictor1,news_vectorizer1,raw)
 			st.write("Linear SVC Model Accuracy on Raw/Training data is :",accuracy_score(raw['sentiment'].values, results_linear))
 
 			#Calculation and prediction for Logistic regresssion model using raw data
 
 			news_vectorizer2 = open("resources/tfidfvect.pkl","rb")
-			tweet_cv2 = joblib.load(news_vectorizer2)
+
 			predictor2 = joblib.load(open(os.path.join("resources/Logistic_regression.pkl"),"rb"))
-			results_logistic = []
-			n = 0
-			while n < len(raw['message']):	
-				vect_text1 = tweet_cv2.transform([raw['message'][n]]).toarray()
-				prediction = predictor2.predict(vect_text1)
-				results_logistic.append(prediction)
-				n+=1
+			results_logistic = predictor_f(predictor2,news_vectorizer2,raw)
 			st.write("Logistic Regression  Model Accuracy on Raw/Training data is :",accuracy_score(raw['sentiment'].values, results_logistic))
 
 		#Classifier selection
