@@ -319,18 +319,18 @@ def main():
 			neutral = []
 			anti = []
 			while i < len(clean_train_df):
-				if clean_train_df['sentiment'].iloc[i] == 2:
+				if df['Sentiment'].iloc[i] == 2:
 					news.append(clean_train_df['message'].iloc[i])
-				elif clean_train_df['sentiment'].iloc[i] == 1:
-					pro.append(clean_train_df['message'].iloc[i])
-				elif clean_train_df['sentiment'].iloc[i] == 0:
-					neutral.append(clean_train_df['message'].iloc[i])
+				elif df['Sentiment'].iloc[i] == 1:
+					pro.append(df['message'].iloc[i])
+				elif df['Sentiment'].iloc[i] == 0:
+					neutral.append(df['message'].iloc[i])
 				else:
-					anti.append(clean_train_df['message'].iloc[i])
+					anti.append(df['message'].iloc[i])
 				i += 1
 
 			st.markdown('''Count number of Sentiments (ordered by message)''')
-			temp = clean_train_df.groupby('sentiment').count()['message'].reset_index().sort_values(by='message',ascending=False)
+			temp = df.groupby('Sentiment').count()['message'].reset_index().sort_values(by='message',ascending=False)
 			temp.style.background_gradient(cmap='Purples')
 			st.table(temp.head())
 
