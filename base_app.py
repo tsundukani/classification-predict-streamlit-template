@@ -114,6 +114,37 @@ def main():
 			plt.axis('off')
 			st.pyplot()
 
+
+			#Funnel graph showing the spread of sentiments in the raw dataframe
+			clean_train_df = raw
+			i = 0
+			news = []
+			pro = []
+			neutral = []
+			anti = []
+			while i < len(clean_train_df):
+				if clean_train_df['sentiment'].iloc[i] == 2:
+					news.append(clean_train_df['message'].iloc[i])
+				elif clean_train_df['sentiment'].iloc[i] == 1:
+					pro.append(clean_train_df['message'].iloc[i])
+				elif clean_train_df['sentiment'].iloc[i] == 0:
+					neutral.append(clean_train_df['message'].iloc[i])
+				else:
+					anti.append(clean_train_df['message'].iloc[i])
+				i += 1
+
+			st.markdown('''Count number of Sentiments (ordered by message)''')
+			temp = clean_train_df.groupby('sentiment').count()['message'].reset_index().sort_values(by='message',ascending=False)
+			temp.style.background_gradient(cmap='Purples')
+			st.table(temp.head())
+
+			fig = go.Figure(go.Funnelarea(
+				text = ["Pro","News", "Neutral", "Anti"],
+				values = temp['message'].values,
+				title = {"position": "top center", "text": "Sentiment Distribution"}
+				))
+			st.plotly_chart(fig)
+
 			
 
 	# Building out the Overiew Page
