@@ -330,7 +330,8 @@ def main():
 				i += 1
 
 			st.markdown('''Count number of Sentiments (ordered by message)''')
-			temp = df.groupby('Sentiment').count()['Message'].reset_index().sort_values(by='Message',ascending=False)
+			temp = df.groupby('Sentiment').count(
+			)['Message'].reset_index().sort_values(by='Message', ascending=False)
 			temp.style.background_gradient(cmap='Purples')
 			st.table(temp.head())
 
